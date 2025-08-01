@@ -40,15 +40,12 @@
             <input type="text" id="terminal-input" autofocus autocomplete="off">
         </div>
     </div>
-    <src >
-        
-    </src>
-    <!-- Music toggle button -->
-    <button id="music-toggle-on" class="music-toggle-button" onclick="document.querySelector('audio').play();console.log('play');document.querySelector('#music-toggle-on').style.display='none';document.querySelector('#music-toggle-off').style.display='block';">
+
+    <!-- Music toggle buttons -->
+    <button id="music-toggle-on" class="music-toggle-button" style="display:block">
         <span id="music-icon" class="music-icon">🔊</span>
     </button>
-    <!-- Music toggle button -->
-    <button id="music-toggle-off" style="display:none" class="music-toggle-button" onclick="document.querySelector('audio').pause();console.log('pause');document.querySelector('#music-toggle-on').style.display='block';document.querySelector('#music-toggle-off').style.display='none';">
+    <button id="music-toggle-off" class="music-toggle-button" style="display:none">
         <span id="music-icon" class="music-icon">🔇</span>
     </button>
 

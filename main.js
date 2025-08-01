@@ -37,7 +37,7 @@ const locations = {
             south: 'general_store'
         },
         items: ['general store'],
-        actions: ['Saloon?','examine general store', 'die']
+        actions: ['go north (to Brimstone Bar)','examine general store', 'die']
     },
     saloon_main_room: {
         description: "You're in the main room of the Brimstone Bar. The air is thick with the smell of stale whiskey and something else—something akin to forgotten memories. The patrons at the tables have faces that feel hauntingly familiar, as if you've seen them in a different life. A long, smoky bar runs along the north wall. The back alley is to the east, and a mysterious cellar door is on the floor to the west. A bustling main road leads south.",
@@ -97,7 +97,7 @@ const deathMessages = {
 const commandAliases = {
     'n': 'go north', 's': 'go south', 'e': 'go east', 'w': 'go west',
     'i': 'inventory', 'x': 'examine', 'l': 'look', 'h': 'help',
-    'take': 'get', 'pick up': 'get', 'end it': 'die', 'exit': 'quit',
+    'take': 'get', 'pick up': 'get', 'end it': 'die', 'exit': 'I QUIT',
 };
 
 
@@ -203,7 +203,7 @@ function processCommand(command) {
         case 'play':
             handlePlayCommand(noun, currentLocation);
             break;
-        case 'quit':
+        case 'I QUIT':
             handleQuitCommand();
             break;
         case 'die':
@@ -301,7 +301,7 @@ function handleHelpCommand() {
     appendToOutput(" - drink [item] (e.g., 'drink strange concoction')", "command-help");
     appendToOutput(" - help (or 'h')", "command-help");
     appendToOutput(" - die (or 'end it')", "command-help");
-    appendToOutput(" - quit (or 'exit')", "command-help");
+    appendToOutput(" - I QUIT (or 'exit')", "command-help");
 }
 
 function handlePlayCommand(item, currentLocation) {
