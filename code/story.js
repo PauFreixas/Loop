@@ -1,7 +1,7 @@
 // --- Story Elements ---
 const locations = {
     sligo_outskirts: {
-        description: "You come awake atop your hungry horse. The town lies before you, a gritty collection of wooden buildings. To the east is the main road into town. Everywhere else is a nasty fall into Gunslinger Loop",
+        description: "To the east is the main road into town.",
         exits: {
             east: 'sligo_main_road'
         },

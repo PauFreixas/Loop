@@ -87,6 +87,7 @@ let gameState = {
     currentLocation: 'sligo_outskirts',
     inventory: [],
     isGameRunning: false,
+    loopTracker: 0,
     pokerGame: {
         isGameActive: false,
         players: [],
@@ -109,7 +110,7 @@ function appendToOutput(text, className = 'game-message') {
 function startGame() {
     if (gameState.isGameRunning) return;
     gameState.isGameRunning = true;
-    resetLoop("You come awake atop your hungry horse. The town lies before you, a gritty collection of wooden buildings. To the east is the main road into town. Everywhere else is a nasty fall into Gunslinger Loop");
+    resetLoop("You come awake atop your hungry horse. The chasm lies before you. Nobody in his right mind seeks to pass through Gunslinger Loop");
     
 }
 
@@ -124,21 +125,46 @@ function displayLocation() {
     updateBackground(gameState.currentLocation);
 }
 
-function resetLoop(message) {
+function clearOutput() {
     outputElement.innerHTML = ''; // Clear previous output
-    document.getElementById('background-music').currentTime = 0;
-    
-    appendToOutput("Gunslinger Loop", "story-text");
-    appendToOutput("-------------------------", "story-text");
-    appendToOutput("You wake up again. The dust tastes the same, and the sun hangs in the same spot. It's a different  town. The same story.", "story-text");
-    
+}
 
+function toSimpleRoman(num) {
+  let result = "";
+  result += "M".repeat(Math.floor(num / 1000));
+  num %= 1000;
+
+  result += "C".repeat(Math.floor(num / 100));
+  num %= 100;
+
+  result += "X".repeat(Math.floor(num / 10));
+  num %= 10;
+
+  result += "I".repeat(num);
+  
+  return result;
+}
+
+function getLoopCounter () {
+
+    return toSimpleRoman(gameState.loopTracker);
+}
+function resetLoop(message) {
+    clearOutput();
+    document.getElementById('background-music').currentTime = 0;
+    loopCounter = getLoopCounter();
+    appendToOutput("Gunslinger Loop " + loopCounter, "story-text");
+
+    appendToOutput("-------------------------", "story-text");
+    gameState.loopTracker++;
+    
     appendToOutput(message, "error-message");
-    appendToOutput("The loop resets.", "game-message");
     gameState.currentLocation = 'sligo_outskirts';
     gameState.inventory = [];
     gameState.pokerGame.isGameActive = false;
     displayLocation();
+    
+
     inputElement.disabled = false;
 }
 
