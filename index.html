@@ -4,10 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gunslinger Loop</title>
-    <!-- Use Tailwind CSS for a clean look -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Link to the external stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <style>
+        .music-toggle-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 2px solid #555;
+            border-radius: 9999px; /* Tailwind's rounded-full */
+            padding: 0.5rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .music-toggle-button:hover {
+            background-color: rgba(40, 40, 40, 0.9);
+        }
+        .music-icon {
+            font-size: 1.5rem;
+            color: #4CAF50;
+        }
+    </style>
 </head>
 <body>
 
@@ -18,12 +40,25 @@
             <input type="text" id="terminal-input" autofocus autocomplete="off">
         </div>
     </div>
+    <src >
+        
+    </src>
+    <!-- Music toggle button -->
+    <button id="music-toggle-on" class="music-toggle-button" onclick="document.querySelector('audio').play();console.log('play');document.querySelector('#music-toggle-on').style.display='none';document.querySelector('#music-toggle-off').style.display='block';">
+        <span id="music-icon" class="music-icon">🔊</span>
+    </button>
+    <!-- Music toggle button -->
+    <button id="music-toggle-off" style="display:none" class="music-toggle-button" onclick="document.querySelector('audio').pause();console.log('pause');document.querySelector('#music-toggle-on').style.display='block';document.querySelector('#music-toggle-off').style.display='none';">
+        <span id="music-icon" class="music-icon">🔇</span>
+    </button>
+
+    <!-- Audio element for background music -->
+    <audio id="background-music" loop preload="auto">
+        <!-- Using a royalty-free western-themed music file from the public domain -->
+        <source src="western.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
     
-    <!--
-        This is the most important part for modularization.
-        We load the main game.js file as a module, which
-        allows it to import from other files like poker.js and story.js.
-    -->
-    <script type="module" src="game.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
