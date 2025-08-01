@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gunslinger Loop</title>
+    <!-- Use Tailwind CSS for a clean look -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Link to the external stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="terminal-output" id="output"></div>
+        <div class="terminal-input-container">
+            <span class="prompt">></span>
+            <input type="text" id="terminal-input" autofocus autocomplete="off">
+        </div>
+    </div>
+    
+    <!--
+        This is the most important part for modularization.
+        We load the main game.js file as a module, which
+        allows it to import from other files like poker.js and story.js.
+    -->
+    <script type="module" src="game.js"></script>
+</body>
+</html>
