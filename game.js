@@ -105,16 +105,17 @@ function updateMoneyUI(amount) {
 function startGame() {
     if (gameState.isGameRunning) return;
     gameState.isGameRunning = true;
-    resetLoop("You come awake atop your hungry horse. A chasm lies before you. You see the town of Sligo at the bottom of Gunlinger Loop.");
+    resetLoop("You come awake atop your hungry horse. A chasm lies before you. You see the town of Sligo at the bottom of Gunslinger Loop.");
 }
 
 function displayLocation() {
     const location = gameState.worldState[gameState.currentLocation];
     appendToOutput(location.description, "story-text");
+    applyLoopChanges(); // Apply changes for the new loop
     if (location.actions && location.actions.length > 0) {
         appendToOutput("You can: " + location.actions.join(', ') + ".", "command-help");
     }
-    appendToOutput("Type 'help' to see available commands.", "command-help");
+    //appendToOutput("Type 'help' to see available commands.", "command-help");
     updateBackground(gameState.currentLocation);
 }
 
@@ -160,8 +161,7 @@ function resetLoop(message) {
     appendToOutput(message, "error-message");
     
     gameState.worldState = JSON.parse(JSON.stringify(initialLocations));
-    applyLoopChanges(); // Apply changes for the new loop
-
+    
     gameState.currentLocation = 'sligo_outskirts';
     gameState.visitedLocations.add('sligo_outskirts');
     gameState.inventory = [];
@@ -217,7 +217,9 @@ function processCommand(command) {
             handleInventoryCommand();
             break;
         case 'help':
-            handleHelpCommand();
+            //handleHelpCommand();
+            appendToOutput("No help is coming.", "error-message");
+            inputElement.value = ''
             break;
         case 'play':
             handlePlayCommand(noun, currentLocation);
@@ -326,6 +328,7 @@ function handleInventoryCommand() {
 
 function handleHelpCommand() {
     appendToOutput("Available commands:", "command-help");
+    appendToOutput()
     appendToOutput(" - go [direction]", "command-help");
     appendToOutput(" - travel [location name]", "command-help");
     appendToOutput(" - look", "command-help");

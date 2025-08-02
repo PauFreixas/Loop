@@ -1,7 +1,7 @@
 // --- Story Elements ---
 const locations = {
     sligo_outskirts: {
-        description: "To the east is the main road into town.",
+        description: "You come awake atop your horse. At the outskirts of town.To the east is the main road into town.",
         exits: {
             east: 'sligo_main_road'
         },
@@ -77,7 +77,7 @@ const deathMessages = {
     bar: "The bartender simply stares at you. His eyes glow brighter, and you feel your essence drain away into the polished obsidian bar.",
     back_alley: "You slip and fall head-first into the sizzling puddle. The last thing you see is the tarnished coin floating above you.",
     cellar_door: "You try to pry the heavy iron door open with your bare hands, and it snaps shut on your fingers. The pain is too much. You fall into darkness.",
-    general_store: "You try to rob the gnome proprietor. He simply sighs, and a strange wave of energy hits you. You feel yourself turning to stone."
+    general_store: "You try to talk to the gnome proprietor. He just blows a raspberry, and a strange wave of energy hits you. You turn to stone and fall into a deep slumber."
 };
 
 const commandAliases = {
