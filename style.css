@@ -26,7 +26,7 @@ body {
 
 /* New class for indoors */
 .bg-indoors {
-    background-color: #404040; /* Dark Grey */
+    background-color: orange; /* Dark Grey */
 }
 
 .game-container {

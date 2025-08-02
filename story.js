@@ -1,7 +1,7 @@
 // --- Story Elements ---
 const locations = {
     sligo_outskirts: {
-        description: "You come awake atop your horse. At the outskirts of town.To the east is the main road into town.",
+        description: "You come awake atop your horse, at the edge of the chasm that is Gunslinger Loop. At the bottom lies the town of Sligo. To the east is the main road into town.",
         exits: {
             east: 'sligo_main_road'
         },
