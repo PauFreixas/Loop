@@ -85,5 +85,3 @@ const commandAliases = {
     'i': 'inventory', 'x': 'examine', 'l': 'look', 'h': 'help',
     'take': 'get', 'pick up': 'get', 'end it': 'die', 'exit': 'I QUIT',
 };
-
-loop_iteration = 0;

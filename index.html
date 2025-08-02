@@ -17,7 +17,6 @@
             padding: 0.5rem;
             cursor: pointer;
             z-index: 10;
-            transition: background-color 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -29,9 +28,25 @@
             font-size: 1.5rem;
             color: #4CAF50;
         }
+        .money-display {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background-color: rgba(30, 30, 30, 0.8);
+            border: 2px solid #FFC107; /* Gold border */
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: #FFC107; /* Gold text */
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: bold;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
+
+    <div id="money-display" class="money-display" style="display: none;"></div>
 
     <div class="game-container">
         <div class="terminal-output" id="output"></div>
