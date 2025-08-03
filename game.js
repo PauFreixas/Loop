@@ -97,6 +97,9 @@ function updateMoneyUI(amount) {
     if (amount > 0) {
         moneyDisplayElement.textContent = `$${amount}`;
         moneyDisplayElement.style.display = 'block';
+
+        document.getElementById("sound-fx").setAttribute("src", "moneybag.mp3");
+        document.getElementById("sound-fx").play();
     } else {
         moneyDisplayElement.style.display = 'none';
     }
@@ -105,7 +108,7 @@ function updateMoneyUI(amount) {
 function startGame() {
     if (gameState.isGameRunning) return;
     gameState.isGameRunning = true;
-    resetLoop("You come awake atop your horse, at the edge of the chasm that is Gunslinger Loop.");
+    resetLoop("The chasm lies before you.");
 }
 
 function displayLocation() {
@@ -178,66 +181,6 @@ function displayAvailableCommands() {
     appendToOutput("Available commands: " + output, "command-help");
 }
 
-/**
- * Gathers all available commands based on the current game state.
- * @returns {string[]} An array of command strings.
- */
-function getAvailableCommands() {
-    // Use a Set to automatically handle duplicate commands
-    const commands = new Set();
-    const currentLocation = gameState.worldState[gameState.currentLocation];
-
-    // If in a poker game, only return poker commands
-    if (gameState.pokerGame.isGameActive) {
-        ['check', 'bet [amount]', 'call', 'raise [amount]', 'wager [item]', 'fold'].forEach(cmd => commands.add(cmd));
-        return Array.from(commands);
-    }
-
-    // --- Add commands based on context ---
-
-    
-    // 2. Movement commands from the current location's exits
-    Object.keys(currentLocation.exits).forEach(exit => commands.add(`go ${exit}`));
-    if (gameState.visitedLocations.size > 1) {
-        commands.add('travel [location]');
-    }
-
-    // 3. Commands for items present in the location
-    currentLocation.items.forEach(item => {
-        if (!['poker table', 'cellar door', 'general store', 'gnome'].includes(item)) {
-             commands.add(`get ${item}`);
-        }
-        commands.add(`examine ${item}`);
-    });
-    
-    // 4. Location-specific commands
-    if (gameState.currentLocation === 'saloon_main_room') {
-        commands.add('examine cellar door');
-        if (currentLocation.items.includes('poker table')) {
-            commands.add('play poker');
-        }
-    }
-
-    // 5. Commands based on items in player's inventory
-    if (gameState.inventory.includes('tarnished coin') && gameState.currentLocation === 'bar') {
-        commands.add('trade tarnished coin');
-    }
-    if (gameState.inventory.includes('strange concoction') && currentLocation.items.includes('strange concoction')) {
-        commands.add('drink strange concoction');
-    }
-
-    // 6. Commands based on game progress (loop tracker)
-    if (gameState.currentLocation === 'bar' && gameState.loopTracker >= 2) {
-        commands.add('ask about the loop');
-    }
-
-    // Universal commands available everywhere
-    ['die'].forEach(cmd => commands.add(cmd));
-
-
-    // Convert the Set to an array and return it
-    return Array.from(commands);
-}
 
 function processCommand(command) {
     if (!gameState.isGameRunning) {
@@ -289,9 +232,6 @@ function processCommand(command) {
         case 'die':
             handleDieCommand();
             break;
-        case 'drink':
-            handleDrinkCommand(noun, currentLocation);
-            break;
         default:
             appendToOutput(`I don't understand that command: '${command}'.`, "error-message");
             break;
@@ -308,19 +248,6 @@ function handleGoCommand(direction, currentLocation) {
         displayAvailableCommands();
     } else {
         appendToOutput("You can't go that way.", "error-message");
-    }
-}
-
-function handleTravelCommand(noun) {
-    const destinationId = Object.keys(locations).find(key => 
-        locations[key] && locations[key].name && locations[key].name.toLowerCase() === noun);
-    
-    if (destinationId && gameState.visitedLocations.has(destinationId)) {
-        gameState.currentLocation = destinationId;
-        appendToOutput(`You travel to the ${locations[destinationId].name}.`, "game-message");
-    
-    } else {
-        appendToOutput("You can't travel there. You either haven't discovered it or it doesn't exist.", "error-message");
     }
 }
 
@@ -383,19 +310,6 @@ function handleInventoryCommand() {
     appendToOutput(invMessage, "game-message");
 }
 
-function handleHelpCommand() {
-    appendToOutput("Available commands:", "command-help");
-    appendToOutput()
-    appendToOutput(" - go [direction]", "command-help");
-    appendToOutput(" - look", "command-help");
-    appendToOutput(" - examine [item]", "command-help");
-    appendToOutput(" - get [item]", "command-help");
-    appendToOutput(" - trade [item] (at the bar)", "command-help");
-    appendToOutput(" - inventory", "command-help");
-    appendToOutput(" - play poker", "command-help");
-    appendToOutput(" - drink [item]", "command-help");
-    appendToOutput(" - die", "command-help");
-}
 
 function handlePlayCommand(item, currentLocation) {
     if (item === 'poker' && currentLocation.items.includes('poker table')) {
@@ -870,9 +784,6 @@ function processCommand(command) {
         case 'go':
             handleGoCommand(noun, currentLocation);
             break;
-        case 'travel':
-            handleTravelCommand(noun);
-            break;
         case 'look':
             handleLookCommand(currentLocation);
             break;
@@ -885,9 +796,6 @@ function processCommand(command) {
             break;
         case 'inventory':
             handleInventoryCommand();
-            break;
-        case 'help':
-            handleHelpCommand();
             break;
         case 'play':
             handlePlayCommand(noun, currentLocation);
@@ -941,7 +849,6 @@ function handleGoCommand(direction, currentLocation) {
     }
 }
 
-// --- Modify getAvailableCommands to show location-specific actions ---
 function getAvailableCommands() {
     const commands = new Set();
     const currentLocation = gameState.worldState[gameState.currentLocation];
@@ -949,6 +856,11 @@ function getAvailableCommands() {
     if (gameState.pokerGame.isGameActive) {
         ['check', 'bet [amount]', 'call', 'raise [amount]', 'wager [item]', 'fold'].forEach(cmd => commands.add(cmd));
         return Array.from(commands);
+    }
+
+    // --- Add this block to read the actions array from story.js ---
+    if (currentLocation.actions) {
+        currentLocation.actions.forEach(action => commands.add(action));
     }
 
     currentLocation.items.forEach(item => {
@@ -965,10 +877,6 @@ function getAvailableCommands() {
         }
     }
     
-    // --- Add this block to read the actions array from story.js ---
-    if (currentLocation.actions) {
-        currentLocation.actions.forEach(action => commands.add(action));
-    }
     // --- End of new block ---
 
     if (gameState.inventory.includes('tarnished coin') && gameState.currentLocation === 'bar') {

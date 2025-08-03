@@ -1,7 +1,7 @@
 // --- Story Elements ---
 const locations = {
     sligo_outskirts: {
-        description: "You´re at the edge of the chasm they call Gunslinger Loop. At the bottom lies the town of Sligo. To the east is the only goddammed road into town.",
+        description: "At the top of Gunslinger Loop.\nThis geographical marvel waves to the heavens like a muddy pitch lasso. \nEvery trail leads down east into Sligo.",
         exits: {
             east: 'sligo_main_road'
         },
@@ -9,17 +9,17 @@ const locations = {
         actions: ['go east','die']
     },
     sligo_main_road: {
-        description: "The main road is a wide sandy path flanked by various establishments. To the west, you can see the outskirts of town where your horse waits. To the north is the notorious Brimstone Bar, and to the south is the general store.",
+        description: "Sligo ain´t much of a town really, just Brimstone to the north and a small store to the south. \nTo the west, you can see a fragment of sky through Gunslinger Loop. \nCan't keep going east without a horse and a gun.",
         exits: {
             west: 'sligo_outskirts',
             north: 'saloon_main_room',
             south: 'general_store'
         },
         items: ['general store'],
-        actions: ['go north (to Brimstone Bar)','examine general store', 'die']
+        actions: ['go north (to Brimstone Bar)','examine general store', 'go south', 'die']
     },
     saloon_main_room: {
-        description: "You're in the main room of the Brimstone Bar. The air is thick with the smell of stale whiskey and something else—something akin to forgotten memories. The patrons at the tables have faces that feel hauntingly familiar, as if you've seen them in a different life. A long, smoky bar runs along the north wall. The back alley is to the east, and a mysterious cellar door is on the floor to the west. A bustling main road leads south.",
+        description: "The Brimstone Bar. The air is thick with the smell of stale whiskey and something else—something akin to forgotten memories. The patrons at the tables have faces that feel hauntingly familiar, as if you've seen them in a different life. A long, smoky bar runs along the north wall. The back alley is to the east, and a mysterious cellar door is on the floor to the west. A bustling main road leads south.",
         exits: {
             east: 'back_alley',
             north: 'bar',
@@ -63,7 +63,7 @@ const locations = {
     }, 
     cellar: {
     name: "Cellar",
-    description: "You've entered the cellar, a dark and dusty space. An old wooden chest sits in the center of the room. You open it and find a note with your name on it. It reads, 'You have found the truth. The loop is broken. Now you are free.' A strange light fills the room and you are transported away.",
+    description: "You've entered the cellar.\nThrough the dim light, you see something you don´t want to see. \nThe two small bodies lie in embrace, disposed of and forgotten. \nYou were too late. \nOn the walls, written in grime:\n'You have found the truth. The loop is broken. Now you are free.'",
     exits: [],
     items: [],
     deathMessage: "The loop is broken. You are free."
@@ -71,13 +71,13 @@ const locations = {
 };
 
 const deathMessages = {
-    sligo_outskirts: "You step off the cliff edge, plummeting into an satirically well named chasm.",
-    sligo_main_road: "A wild-eyed stranger on a passing carriage draws his pistol and fires. You feel a searing pain before the world dissolves.",
-    saloon_main_room: "You challenge the entire room. Twenty bullets come back at you.",
-    bar: "The bartender simply stares at you. His eyes glow brighter, and you feel your essence drain away into the polished obsidian bar.",
+    sligo_outskirts: "You step off the cliff edge, plummeting into a comically named chasm.",
+    sligo_main_road: "A wild-eyed outlaw draws his pistol and fires. You feel an oozing red hole near your spleen before the world dissolves.",
+    saloon_main_room: "You challenge the entire room. They win.",
+    bar: "You sit at the obsidian bar for a drink...And forget how to stop.\nThe bartender seems to grow stronger each passing day as you drink yourself to death.",
     back_alley: "You slip and fall head-first into the sizzling puddle. The last thing you see is the tarnished coin floating above you.",
     cellar_door: "You try to pry the heavy iron door open with your bare hands, and it snaps shut on your fingers. The pain is too much. You fall into darkness.",
-    general_store: "You try to talk to the gnome proprietor. He just blows a raspberry, and a strange wave of energy hits you. You turn to stone and fall into a deep slumber."
+    general_store: "You slap the gnome proprietor. He just blows a raspberry, and a strange wave of energy hits you. You turn to stone forever."
 };
 
 const commandAliases = {
