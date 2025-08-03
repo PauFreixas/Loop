@@ -1,7 +1,7 @@
 // --- Story Elements ---
 const locations = {
     sligo_outskirts: {
-        description: "You come awake atop your horse, at the edge of the chasm that is Gunslinger Loop. At the bottom lies the town of Sligo. To the east is the main road into town.",
+        description: "You´re at the edge of the chasm they call Gunslinger Loop. At the bottom lies the town of Sligo. To the east is the only goddammed road into town.",
         exits: {
             east: 'sligo_main_road'
         },
@@ -27,7 +27,7 @@ const locations = {
             south: 'sligo_main_road'
         },
         items: ['poker table'],
-        actions: ['examine poker table', 'look at patrons', 'play poker', 'die']
+        actions: ['go east (into back alley)','examine poker table', 'look at patrons', 'play poker', 'die']
     },
     bar: {
         description: "The bar is made of what looks like polished obsidian. Behind it, a bartender with glowing red eyes polishes a chalice. There are a few bottles of strange concoctions on the shelves. The main room is back to the south.",
@@ -73,7 +73,7 @@ const locations = {
 const deathMessages = {
     sligo_outskirts: "You step off the cliff edge, plummeting into an satirically well named chasm.",
     sligo_main_road: "A wild-eyed stranger on a passing carriage draws his pistol and fires. You feel a searing pain before the world dissolves.",
-    saloon_main_room: "You draw your own big iron from the hip and challenge the entire room. One shot you release but twenty come back at you.",
+    saloon_main_room: "You challenge the entire room. Twenty bullets come back at you.",
     bar: "The bartender simply stares at you. His eyes glow brighter, and you feel your essence drain away into the polished obsidian bar.",
     back_alley: "You slip and fall head-first into the sizzling puddle. The last thing you see is the tarnished coin floating above you.",
     cellar_door: "You try to pry the heavy iron door open with your bare hands, and it snaps shut on your fingers. The pain is too much. You fall into darkness.",
@@ -82,6 +82,7 @@ const deathMessages = {
 
 const commandAliases = {
     'n': 'go north', 's': 'go south', 'e': 'go east', 'w': 'go west',
+    'go e': 'go east', 'go w': 'go west', 'go n': 'go north', 'go s': 'go south',
     'i': 'inventory', 'x': 'examine', 'l': 'look', 'h': 'help',
     'take': 'get', 'pick up': 'get', 'end it': 'die', 'exit': 'I QUIT',
 };

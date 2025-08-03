@@ -29,7 +29,7 @@ function updateBackground(locationId) {
     let track = document.getElementById('background-music').getAttribute('src');
 
     if (musicIsOn) {
-        if (locationId === 'saloon_main_room') {
+        if (locationId === 'saloon_main_room' || locationId === 'bar' ) {
             if (track !== 'Saloon.mp3') {
                 document.getElementById('background-music').setAttribute('src', 'Saloon.mp3');
                 document.getElementById('background-music').play();
@@ -105,18 +105,15 @@ function updateMoneyUI(amount) {
 function startGame() {
     if (gameState.isGameRunning) return;
     gameState.isGameRunning = true;
-    resetLoop("You come awake atop your hungry horse. A chasm lies before you. You see the town of Sligo at the bottom of Gunslinger Loop.");
+    resetLoop("You come awake atop your horse, at the edge of the chasm that is Gunslinger Loop.");
 }
 
 function displayLocation() {
     const location = gameState.worldState[gameState.currentLocation];
     appendToOutput(location.description, "story-text");
-    applyLoopChanges(); // Apply changes for the new loop
-    if (location.actions && location.actions.length > 0) {
-        appendToOutput("You can: " + location.actions.join(', ') + ".", "command-help");
-    }
-    //appendToOutput("Type 'help' to see available commands.", "command-help");
+    
     updateBackground(gameState.currentLocation);
+    
 }
 
 function clearOutput() {
@@ -152,6 +149,7 @@ function applyLoopChanges() {
 }
 
 function resetLoop(message) {
+    applyLoopChanges();
     clearOutput();
     document.getElementById('background-music').currentTime = 0;
     const loopCounter = getLoopCounter();
@@ -164,12 +162,81 @@ function resetLoop(message) {
     
     gameState.currentLocation = 'sligo_outskirts';
     gameState.visitedLocations.add('sligo_outskirts');
+    
     gameState.inventory = [];
     gameState.money = 0;
     updateMoneyUI(0);
     gameState.pokerGame.isGameActive = false;
     displayLocation();
+    appendToOutput("Your pockets are empty, the frontier lies unbothered before you.");
+    displayAvailableCommands();
     inputElement.disabled = false;
+}
+
+function displayAvailableCommands() {
+    output = getAvailableCommands();
+    appendToOutput("Available commands: " + output, "command-help");
+}
+
+/**
+ * Gathers all available commands based on the current game state.
+ * @returns {string[]} An array of command strings.
+ */
+function getAvailableCommands() {
+    // Use a Set to automatically handle duplicate commands
+    const commands = new Set();
+    const currentLocation = gameState.worldState[gameState.currentLocation];
+
+    // If in a poker game, only return poker commands
+    if (gameState.pokerGame.isGameActive) {
+        ['check', 'bet [amount]', 'call', 'raise [amount]', 'wager [item]', 'fold'].forEach(cmd => commands.add(cmd));
+        return Array.from(commands);
+    }
+
+    // --- Add commands based on context ---
+
+    
+    // 2. Movement commands from the current location's exits
+    Object.keys(currentLocation.exits).forEach(exit => commands.add(`go ${exit}`));
+    if (gameState.visitedLocations.size > 1) {
+        commands.add('travel [location]');
+    }
+
+    // 3. Commands for items present in the location
+    currentLocation.items.forEach(item => {
+        if (!['poker table', 'cellar door', 'general store', 'gnome'].includes(item)) {
+             commands.add(`get ${item}`);
+        }
+        commands.add(`examine ${item}`);
+    });
+    
+    // 4. Location-specific commands
+    if (gameState.currentLocation === 'saloon_main_room') {
+        commands.add('examine cellar door');
+        if (currentLocation.items.includes('poker table')) {
+            commands.add('play poker');
+        }
+    }
+
+    // 5. Commands based on items in player's inventory
+    if (gameState.inventory.includes('tarnished coin') && gameState.currentLocation === 'bar') {
+        commands.add('trade tarnished coin');
+    }
+    if (gameState.inventory.includes('strange concoction') && currentLocation.items.includes('strange concoction')) {
+        commands.add('drink strange concoction');
+    }
+
+    // 6. Commands based on game progress (loop tracker)
+    if (gameState.currentLocation === 'bar' && gameState.loopTracker >= 2) {
+        commands.add('ask about the loop');
+    }
+
+    // Universal commands available everywhere
+    ['die'].forEach(cmd => commands.add(cmd));
+
+
+    // Convert the Set to an array and return it
+    return Array.from(commands);
 }
 
 function processCommand(command) {
@@ -200,26 +267,12 @@ function processCommand(command) {
         case 'go':
             handleGoCommand(noun, currentLocation);
             break;
-        case 'travel':
-            handleTravelCommand(noun);
-            break;
         case 'look':
             handleLookCommand(currentLocation);
-            break;
-        case 'examine':
-            handleExamineCommand(noun, currentLocation);
             break;
         case 'get':
         case 'take':
             handleGetCommand(noun, currentLocation);
-            break;
-        case 'inventory':
-            handleInventoryCommand();
-            break;
-        case 'help':
-            //handleHelpCommand();
-            appendToOutput("No help is coming.", "error-message");
-            inputElement.value = ''
             break;
         case 'play':
             handlePlayCommand(noun, currentLocation);
@@ -230,7 +283,7 @@ function processCommand(command) {
         case 'ask':
             handleAskCommand(noun);
             break;
-        case 'I QUIT':
+        case 'quit':
             handleQuitCommand();
             break;
         case 'die':
@@ -243,6 +296,7 @@ function processCommand(command) {
             appendToOutput(`I don't understand that command: '${command}'.`, "error-message");
             break;
     }
+    
 }
 
 function handleGoCommand(direction, currentLocation) {
@@ -251,18 +305,20 @@ function handleGoCommand(direction, currentLocation) {
         gameState.currentLocation = nextLocation;
         gameState.visitedLocations.add(nextLocation);
         displayLocation();
+        displayAvailableCommands();
     } else {
         appendToOutput("You can't go that way.", "error-message");
     }
 }
 
 function handleTravelCommand(noun) {
-    const destinationId = Object.keys(locations).find(key => locations[key].name.toLowerCase() === noun);
-
+    const destinationId = Object.keys(locations).find(key => 
+        locations[key] && locations[key].name && locations[key].name.toLowerCase() === noun);
+    
     if (destinationId && gameState.visitedLocations.has(destinationId)) {
         gameState.currentLocation = destinationId;
         appendToOutput(`You travel to the ${locations[destinationId].name}.`, "game-message");
-        displayLocation();
+    
     } else {
         appendToOutput("You can't travel there. You either haven't discovered it or it doesn't exist.", "error-message");
     }
@@ -273,6 +329,7 @@ function handleLookCommand(currentLocation) {
     if (currentLocation.items.length > 0) {
         appendToOutput("You also see: " + currentLocation.items.join(', ') + ".", "command-help");
     }
+    displayAvailableCommands();
 }
 
 function handleExamineCommand(item, currentLocation) {
@@ -330,7 +387,6 @@ function handleHelpCommand() {
     appendToOutput("Available commands:", "command-help");
     appendToOutput()
     appendToOutput(" - go [direction]", "command-help");
-    appendToOutput(" - travel [location name]", "command-help");
     appendToOutput(" - look", "command-help");
     appendToOutput(" - examine [item]", "command-help");
     appendToOutput(" - get [item]", "command-help");
@@ -338,9 +394,7 @@ function handleHelpCommand() {
     appendToOutput(" - inventory", "command-help");
     appendToOutput(" - play poker", "command-help");
     appendToOutput(" - drink [item]", "command-help");
-    appendToOutput(" - help", "command-help");
     appendToOutput(" - die", "command-help");
-    appendToOutput(" - I QUIT", "command-help");
 }
 
 function handlePlayCommand(item, currentLocation) {
@@ -642,6 +696,7 @@ function endPokerRound() {
         resetLoop("You lost all your money at the poker table and were unceremoniously thrown out into the dust.");
     }
     displayLocation();
+    displayAvailableCommands();
 }
 
 function handleWagerCommand(itemName) {
@@ -733,9 +788,205 @@ inputElement.addEventListener('keydown', (e) => {
         const command = inputElement.value;
         if (command.trim() !== '') {
             processCommand(command);
-            inputElement.value = '';
+            
         }
+        
+        inputElement.value = '';
     }
 });
+
+// --- Add this new function to handle the win condition ---
+function endGame(winMessage) {
+    clearOutput();
+    appendToOutput(winMessage, 'story-text');
+    appendToOutput("\n--- YOU HAVE BROKEN THE LOOP ---", "story-text");
+    appendToOutput("Thank you for playing!", "game-message");
+    gameState.isGameRunning = false;
+    inputElement.disabled = true;
+    const audio = document.getElementById("background-music");
+    if (audio) {
+        audio.pause();
+    }
+}
+
+
+// --- Add this new function to handle the 'unlock' command ---
+function handleUnlockCommand(noun) {
+    if (noun !== 'door') {
+        appendToOutput("Unlock what? It's best to be specific.", "error-message");
+        return;
+    }
+    // This command only works at the cellar_door location, as per the game's structure.
+    if (gameState.currentLocation !== 'cellar_door') {
+        appendToOutput("You don't see a door to unlock here.", "error-message");
+        return;
+    }
+    const coinIndex = gameState.inventory.indexOf('tarnished coin');
+    if (coinIndex !== -1) {
+        // Player has the required item
+        appendToOutput("You kneel and insert the tarnished coin into the strange slot on the iron door. It fits perfectly. With a heavy *CLUNK*, the lock disengages.", "game-message");
+        gameState.inventory.splice(coinIndex, 1); // Use up the coin
+
+        // Dynamically update the game world state
+        const cellarDoorState = gameState.worldState.cellar_door;
+        cellarDoorState.description = "The heavy iron door is now unlocked. A dark staircase leads down into the cellar.";
+        cellarDoorState.exits.down = 'cellar'; // Add a new exit to the now-accessible cellar
+
+        // Update available actions for the player
+        const actions = cellarDoorState.actions;
+        const unlockActionIndex = actions.indexOf('unlock door');
+        if (unlockActionIndex > -1) {
+            actions.splice(unlockActionIndex, 1);
+        }
+        actions.push('go down');
+
+        appendToOutput("The way down is now open.", "story-text");
+    } else {
+        // Player does not have the item
+        appendToOutput("You examine the lock, but you don't have anything that fits the strange, coin-shaped slot.", "error-message");
+    }
+}
+
+// --- Modify the processCommand function to include the new command ---
+function processCommand(command) {
+    if (!gameState.isGameRunning) {
+        appendToOutput("Game is not running. Refresh to start.", "error-message");
+        return;
+    }
+    appendToOutput(`> ${command}`, "command-history-item");
+    let normalizedCommand = command.toLowerCase().trim();
+    if (commandAliases[normalizedCommand]) {
+        normalizedCommand = commandAliases[normalizedCommand];
+    }
+    const parts = normalizedCommand.split(' ');
+    const verb = parts[0];
+    const noun = parts.slice(1).join(' ');
+    if (gameState.pokerGame.isGameActive) {
+        handlePokerCommands(verb, noun);
+        return;
+    }
+    const currentLocation = gameState.worldState[gameState.currentLocation];
+    switch (verb) {
+        case 'go':
+            handleGoCommand(noun, currentLocation);
+            break;
+        case 'travel':
+            handleTravelCommand(noun);
+            break;
+        case 'look':
+            handleLookCommand(currentLocation);
+            break;
+        case 'examine':
+            handleExamineCommand(noun, currentLocation);
+            break;
+        case 'get':
+        case 'take':
+            handleGetCommand(noun, currentLocation);
+            break;
+        case 'inventory':
+            handleInventoryCommand();
+            break;
+        case 'help':
+            handleHelpCommand();
+            break;
+        case 'play':
+            handlePlayCommand(noun, currentLocation);
+            break;
+        case 'trade':
+            handleTradeCommand(noun);
+            break;
+        case 'ask':
+            handleAskCommand(noun);
+            break;
+        case 'quit':
+            handleQuitCommand();
+            break;
+        case 'die':
+            handleDieCommand();
+            break;
+        case 'drink':
+            handleDrinkCommand(noun, currentLocation);
+            break;
+        // --- Add this new case ---
+        case 'unlock':
+            handleUnlockCommand(noun);
+            break;
+        default:
+            appendToOutput(`I don't understand that command: '${command}'.`, "error-message");
+            break;
+    }
+}
+
+
+// --- Modify the handleGoCommand function to trigger the win state ---
+function handleGoCommand(direction, currentLocation) {
+    if (currentLocation.exits[direction]) {
+        const nextLocation = currentLocation.exits[direction];
+
+        // --- Add this block to check for the win condition ---
+        if (nextLocation === 'cellar') {
+            const cellar = gameState.worldState[nextLocation];
+            // The cellar's description contains the final text.
+            endGame(cellar.description);
+            return; // Stop processing to prevent moving to the location.
+        }
+        // --- End of new block ---
+
+        gameState.currentLocation = nextLocation;
+        gameState.visitedLocations.add(nextLocation);
+        displayLocation();
+        displayAvailableCommands();
+    } else {
+        appendToOutput("You can't go that way.", "error-message");
+    }
+}
+
+// --- Modify getAvailableCommands to show location-specific actions ---
+function getAvailableCommands() {
+    const commands = new Set();
+    const currentLocation = gameState.worldState[gameState.currentLocation];
+
+    if (gameState.pokerGame.isGameActive) {
+        ['check', 'bet [amount]', 'call', 'raise [amount]', 'wager [item]', 'fold'].forEach(cmd => commands.add(cmd));
+        return Array.from(commands);
+    }
+
+    currentLocation.items.forEach(item => {
+        if (!['poker table', 'cellar door', 'general store', 'gnome'].includes(item)) {
+            commands.add(`get ${item}`);
+        }
+        commands.add(`examine ${item}`);
+    });
+
+    if (gameState.currentLocation === 'saloon_main_room') {
+        commands.add('examine cellar door');
+        if (currentLocation.items.includes('poker table')) {
+            commands.add('play poker');
+        }
+    }
+    
+    // --- Add this block to read the actions array from story.js ---
+    if (currentLocation.actions) {
+        currentLocation.actions.forEach(action => commands.add(action));
+    }
+    // --- End of new block ---
+
+    if (gameState.inventory.includes('tarnished coin') && gameState.currentLocation === 'bar') {
+        commands.add('trade tarnished coin');
+    }
+    if (gameState.inventory.includes('strange concoction') && currentLocation.items.includes('strange concoction')) {
+        commands.add('drink strange concoction');
+    }
+
+    if (gameState.currentLocation === 'bar' && gameState.loopTracker >= 2) {
+        commands.add('ask about the loop');
+    }
+
+    if (!currentLocation.actions || !currentLocation.actions.includes('die')) {
+         commands.add('die');
+    }
+
+    return Array.from(commands);
+}
 
 window.onload = startGame;
