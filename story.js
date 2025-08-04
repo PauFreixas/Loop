@@ -1,7 +1,7 @@
 // --- Story Elements ---
 const locations = {
     sligo_outskirts: {
-        description: "At the top of Gunslinger Loop.\nThis geographical marvel waves to the heavens like a muddy pitch lasso. \nEvery trail leads down east into Sligo.",
+        description: "At the top of Gunslinger Loop.\nThis wicked geographical accident waves to the heavens like a muddy pitch lasso. \nEvery trail leads down east into Sligo.",
         exits: {
             east: 'sligo_main_road'
         },
@@ -19,7 +19,7 @@ const locations = {
         actions: ['go north (to Brimstone Bar)','examine general store', 'go south', 'die']
     },
     saloon_main_room: {
-        description: "The Brimstone Bar. The air is thick with the smell of stale whiskey and something else—something akin to forgotten memories. The patrons at the tables have faces that feel hauntingly familiar, as if you've seen them in a different life. A long, smoky bar runs along the north wall. The back alley is to the east, and a mysterious cellar door is on the floor to the west. A bustling main road leads south.",
+        description: "The Brimstone Bar is a place drowning in smoke and music.\nThe whiskey soothes the patrons' violent temperament. \nA long, pitch-black bar runs along the north wall. \nAn open Alley facing east .The locked Cellar to the west.\nExit is south.",
         exits: {
             east: 'back_alley',
             north: 'bar',
@@ -30,20 +30,20 @@ const locations = {
         actions: ['go east (into back alley)','examine poker table', 'look at patrons', 'play poker', 'die']
     },
     bar: {
-        description: "The bar is made of what looks like polished obsidian. Behind it, a bartender with glowing red eyes polishes a chalice. There are a few bottles of strange concoctions on the shelves. The main room is back to the south.",
+        description: "The bar is made of what looks like polished obsidian. \nBehind it, a bartender with glowing red eyes polishes a chalice. \nThe main room is back to the south.",
         exits: {
             south: 'saloon_main_room'
         },
-        items: ['strange concoction'],
-        actions: ['get strange concoction', 'talk to bartender', 'drink strange concoction', 'die']
+        items: [],
+        actions: [ 'die']
     },
     back_alley: {
-        description: "The alley is dark and grimy. A discarded, tarnished coin lies in a puddle of something that sizzles when you get close. The main room is back to the west.",
+        description: "The alley is dark and grimy. \nA tarnished coin lies in a puddle of waste that sizzles when you get close. \nThe main room is back to the west.",
         exits: {
             west: 'saloon_main_room'
         },
         items: ['tarnished coin'],
-        actions: ['get tarnished coin', 'die']
+        actions: ['go west (back into Brimstone)', 'get tarnished coin', 'die']
     },
     cellar_door: {
         description: "A heavy, iron door is set into the floor. It's locked. The main room is back to the east.",
